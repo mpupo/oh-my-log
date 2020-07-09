@@ -20,6 +20,6 @@ class Application(models.Model):
 class Event(models.Model):
     pass
 
-class Execution(models.Model)
+class Execution(models.Model):
     pass
 
