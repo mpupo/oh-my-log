@@ -11,8 +11,28 @@ class User(models.Model):
 class Group(models.Model):
     pass
 
+class OperationSystem(models.Model):
+    "Operation systems model"
+
+    name = models.CharField('Name', max_length=50)
+    version = models.CharField('Version', max_length=8)
+
+
 class Machine(models.Model):
-    pass
+    "Machine model"
+
+    class MachineEnvChoices(models.TextChoices):
+        "A Class to choose a variety of environment types"
+        DEV = 'DEV', 'Development'
+        PROD = 'PROD', 'Production'
+        QA = 'QA', 'Quality Assurance'
+        TEST = 'TEST', 'Test'
+
+    name = models.CharField('Name', max_length=50, null=True)
+    active = models.BooleanField('Active', null=False, default=True)
+    environment = models.CharField('Enviroment', max_length=30, choices=MachineEnvChoices.choices, default=MachineEnvChoices.DEV)
+    address = models.GenericIPAddressField(protocol='IPV4', validators=[validators.validate_ipv4_address], null=True)
+    operation_systems = models.ManyToManyField(OperationSystem)
 
 class Application(models.Model):
     pass
@@ -22,4 +42,5 @@ class Event(models.Model):
 
 class Execution(models.Model):
     pass
+
 

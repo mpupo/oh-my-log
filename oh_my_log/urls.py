@@ -16,10 +16,29 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+from rest_framework_extensions.routers import NestedRouterMixin
 from log_api import views
 
-router = DefaultRouter()
-router.register(r'users', views.UserViewSet)
+# To make a nested api rotes like 'machines/1/os/2':
+class NestedDefaultRouter(NestedRouterMixin, DefaultRouter):
+    pass
+
+router = NestedDefaultRouter()
+
+# User Router:
+user_router = router.register(r'users', views.UserViewSet)
+
+# OS Router:
+os_router = router.register(r'os', views.OperationSystemViewSet)
+
+# Machine Router:
+machines_router = router.register('machines', views.MachineViewSet)
+machines_router.register(
+    'os', 
+    views.OperationSystemViewSet, 
+    basename='machine-os', 
+    parents_query_lookups=['machine']
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
