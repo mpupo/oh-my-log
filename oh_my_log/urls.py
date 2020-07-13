@@ -30,6 +30,11 @@ user_router = router.register(r'users', views.UserViewSet)
 
 # OS Router:
 os_router = router.register(r'os', views.OperationSystemViewSet)
+os_router.register(
+    'installed-apps', 
+    views.ApplicationViewSet,
+    basename='app-os',
+    parents_query_lookups=['operationsystem'])
 
 # Machine Router:
 machines_router = router.register('machines', views.MachineViewSet)
@@ -39,6 +44,10 @@ machines_router.register(
     basename='machine-os', 
     parents_query_lookups=['machine']
 )
+
+# Applications router:
+application_router = router.register('applications', views.ApplicationViewSet)
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
