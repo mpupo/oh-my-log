@@ -11,11 +11,21 @@ class User(models.Model):
 class Group(models.Model):
     pass
 
+class Application(models.Model):
+    "Application model"
+
+    name = models.CharField('Name', max_length=50, null=False, default='App-Name')
+    active = models.BooleanField('Active', null=False, default=True)
+    description = models.TextField('Description', null=True)
+    version = models.CharField('Version', max_length=8, null=True)
+
+
 class OperationSystem(models.Model):
     "Operation systems model"
 
     name = models.CharField('Name', max_length=50)
     version = models.CharField('Version', max_length=8)
+    installed_apps = models.ManyToManyField(Application)
 
 
 class Machine(models.Model):
@@ -34,8 +44,7 @@ class Machine(models.Model):
     address = models.GenericIPAddressField(protocol='IPV4', validators=[validators.validate_ipv4_address], null=True)
     operation_systems = models.ManyToManyField(OperationSystem)
 
-class Application(models.Model):
-    pass
+
 
 class Event(models.Model):
     pass
