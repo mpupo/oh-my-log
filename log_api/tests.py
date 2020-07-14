@@ -1,3 +1,4 @@
+import datetime
 from django.test import TestCase
 from django.urls import include, path, reverse
 from rest_framework.test import APITestCase
@@ -38,3 +39,45 @@ class TestUserAPI(APITestCase, URLPatternsTestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(User.objects.count(),1)
         self.assertEqual(User.objects.get().name, 'Murilo')
+
+    def test_retrieve_user_by_id(self):
+        pass
+
+    def test_delete_user(self):
+        pass
+
+    def test_edit_user(self):
+        pass
+
+
+class TestExecutionAPI(APITestCase, URLPatternsTestCase):
+
+    router = DefaultRouter()
+    router.register(r'executions', views.ExecutionViewSet)
+
+    urlpatterns = [
+        path('', include(router.urls))
+    ]
+
+    def test_create_execution(self):
+        execution_data = dict(
+            machine_id=1,
+            application_id=1,
+            dateref=str(datetime.datetime.now()),
+            success=True)
+
+        response = self.client.post('/executions/', execution_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Execution.objects.count(),1)
+
+    def test_retrieve_executions(self):
+        response = self.client.get('/executions')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_retrieve_execution_by_id(self):
+        response = self.client.get('/executions/1')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+    
+    def test_delete_execution_by_id(self):
+        response = self.client.delete('/executions/1')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)

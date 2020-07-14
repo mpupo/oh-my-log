@@ -60,7 +60,18 @@ class Machine(models.Model):
 
 
 class Execution(models.Model):
-    pass
+    "Execution model"
+
+    machine_id = models.ForeignKey(
+        Machine, on_delete=models.deletion.DO_NOTHING, related_name="machine_execution"
+    )
+    application_id = models.ForeignKey(
+        Application,
+        on_delete=models.deletion.DO_NOTHING,
+        related_name="application_execution",
+    )
+    dateref = models.DateTimeField("DateRef", auto_now_add=True)
+    success = models.BooleanField("Success", null=False)
 
 
 class Event(models.Model):

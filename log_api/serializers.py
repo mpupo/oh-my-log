@@ -55,7 +55,9 @@ class MachineModelSerializer(serializers.ModelSerializer):
 
 
 class ExecutionModelSerializer(serializers.ModelSerializer):
-    pass
+    class Meta:
+        model = Execution
+        fields = ['id', 'machine_id', 'application_id', 'dateref', 'success']
 
 
 class EventModelSerializer(serializers.ModelSerializer):
