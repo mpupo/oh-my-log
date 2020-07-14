@@ -54,6 +54,9 @@ application_router = router.register("applications", views.ApplicationViewSet)
 # Events router:
 events_router = router.register("events", views.EventViewSet)
 
+# Executions router:
+executions_router = router.register("executions", views.ExecutionViewSet)
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include(router.urls)),

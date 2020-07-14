@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework import viewsets, mixins, generics, status
+from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework import permissions
 from rest_framework_extensions.mixins import NestedViewSetMixin
@@ -36,8 +36,15 @@ class ApplicationViewSet(NestedViewSetMixin, viewsets.ModelViewSet):
     serializer_class = ApplicationModelSerializer
 
 
-class ExecutionViewSet(NestedViewSetMixin, viewsets.ModelViewSet):
-    pass
+class ExecutionViewSet(
+    NestedViewSetMixin,
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    viewsets.GenericViewSet,
+):
+    queryset = Execution.objects.all()
+    serializer_class = ExecutionModelSerializer
 
 
 class EventViewSet(
