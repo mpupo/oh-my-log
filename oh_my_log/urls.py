@@ -23,33 +23,38 @@ from log_api import views
 class NestedDefaultRouter(NestedRouterMixin, DefaultRouter):
     pass
 
+
 router = NestedDefaultRouter()
 
 # User Router:
-user_router = router.register(r'users', views.UserViewSet)
+user_router = router.register(r"users", views.UserViewSet)
 
 # OS Router:
-os_router = router.register(r'os', views.OperationSystemViewSet)
+os_router = router.register(r"os", views.OperationSystemViewSet)
 os_router.register(
-    'installed-apps', 
+    "installed-apps",
     views.ApplicationViewSet,
-    basename='app-os',
-    parents_query_lookups=['operationsystem'])
+    basename="app-os",
+    parents_query_lookups=["operationsystem"],
+)
 
 # Machine Router:
-machines_router = router.register('machines', views.MachineViewSet)
+machines_router = router.register("machines", views.MachineViewSet)
 machines_router.register(
-    'os', 
-    views.OperationSystemViewSet, 
-    basename='machine-os', 
-    parents_query_lookups=['machine']
+    "os",
+    views.OperationSystemViewSet,
+    basename="machine-os",
+    parents_query_lookups=["machine"],
 )
 
 # Applications router:
-application_router = router.register('applications', views.ApplicationViewSet)
+application_router = router.register("applications", views.ApplicationViewSet)
 
+
+# Events router:
+events_router = router.register("events", views.EventViewSet)
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include(router.urls)),
+    path("admin/", admin.site.urls),
+    path("", include(router.urls)),
 ]
