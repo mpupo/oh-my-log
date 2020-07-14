@@ -45,11 +45,27 @@ class Machine(models.Model):
     operation_systems = models.ManyToManyField(OperationSystem)
 
 
-
-class Event(models.Model):
-    pass
-
 class Execution(models.Model):
     pass
 
+class Event(models.Model):
+    "Event model"
 
+    class EventLevelChoices(models.TextChoices):
+        "A Class to choose a variety of event types"
+        CRITICAL = 'CRITICAL', 'CRITICAL'
+        DEBUG = 'DEBUG', 'DEBUG'
+        WARNING = 'WARNING', 'WARNING'
+        INFO = 'INFO', 'INFO'
+
+    level = models.CharField(
+        'Level', max_length=20,
+        choices=EventLevelChoices.choices,
+        default=EventLevelChoices.INFO)
+    dateref = models.DateField('Date', auto_now_add=True)
+    archived = models.BooleanField('Archived')
+    description = models.TextField('Description')
+    execution = models.ForeignKey(
+        Execution,
+        on_delete=models.deletion.DO_NOTHING,
+        related_name='execution')
