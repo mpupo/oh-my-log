@@ -90,9 +90,9 @@ class Event(models.Model):
         choices=EventLevelChoices.choices,
         default=EventLevelChoices.INFO,
     )
-    dateref = models.DateField("Date", auto_now_add=True)
+    dateref = models.DateTimeField("DateRef")
     archived = models.BooleanField("Archived")
     description = models.TextField("Description")
-    execution = models.ForeignKey(
-        Execution, on_delete=models.deletion.CASCADE, related_name="execution"
+    execution_id = models.ForeignKey(
+        Execution, on_delete=models.deletion.CASCADE, related_name="execution_id"
     )

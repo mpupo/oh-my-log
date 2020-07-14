@@ -61,9 +61,9 @@ class ExecutionModelSerializer(serializers.ModelSerializer):
 
 
 class EventModelSerializer(serializers.ModelSerializer):
-    execution = ExecutionModelSerializer(read_only=True)
+    execution_id = serializers.PrimaryKeyRelatedField(queryset=Execution.objects.all())
 
     class Meta:
         model = Event
-        fields = ["id", "level", "dateref", "archived", "description", "execution"]
+        fields = ["id", "level", "dateref", "archived", "description", "execution_id"]
 
