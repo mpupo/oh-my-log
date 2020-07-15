@@ -1,17 +1,30 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
+from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 from django.core import validators
 
 # Create your models here.
-class User(models.Model):
+class User(AbstractUser):
     "User model"
-    name = models.CharField("Name", max_length=50)
-    email = models.EmailField(
-        "E-mail", max_length=254, validators=[validators.EmailValidator()]
+    username = models.CharField("Name", max_length=100, unique=True)
+    email = models.EmailField(_('Email address'), max_length=254, validators=[validators.EmailValidator()], unique=True
     )
-    password = models.CharField(
-        "Password", max_length=50, validators=[validators.MinLengthValidator(8)]
-    )
+
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email', 'first_name', 'last_name']
+
+    def __str__(self):
+        return f"{self.username}"
+
+class UserProfile(models.Model):
+    "User Profile model"
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile')
+    nickname = models.CharField("Nickname", max_length=100)
     last_login = models.DateTimeField("Last login", auto_now_add=True)
+    active = models.BooleanField("Active")
+    created_at = models.DateField("Created at", auto_now_add=True)
+    last_time_modified = models.DateTimeField("Last time modified", auto_now_add=True)
 
 
 class Group(models.Model):
