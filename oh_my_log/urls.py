@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework_extensions.routers import NestedRouterMixin
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from log_api import views
 
 # To make a nested api rotes like 'machines/1/os/2':
@@ -59,5 +60,7 @@ executions_router = router.register("executions", views.ExecutionViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", include(router.urls)),
+    path("api/", include(router.urls)),
+    path("api/token/", TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path("api/token/refresh/", TokenRefreshView.as_view(), name='token_refresh')
 ]
