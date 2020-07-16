@@ -25,13 +25,13 @@ class NestedDefaultRouter(NestedRouterMixin, DefaultRouter):
     pass
 
 
-router = NestedDefaultRouter()
+router = NestedDefaultRouter(trailing_slash=False)
 
 # User Router:
-user_router = router.register(r"users", views.UserViewSet)
+user_router = router.register(r"users/?", views.UserViewSet)
 
 # Machine Router:
-machines_router = router.register("machines", views.MachineViewSet)
+machines_router = router.register(r"machines/?", views.MachineViewSet)
 machines_router.register(
     "apps",
     views.ApplicationViewSet,
@@ -40,17 +40,17 @@ machines_router.register(
 )
 
 # Applications router:
-application_router = router.register("applications", views.ApplicationViewSet)
+application_router = router.register(r"applications/?", views.ApplicationViewSet)
 
 # Events router:
-events_router = router.register("events", views.EventViewSet)
+events_router = router.register(r"events/?", views.EventViewSet)
 
 # Executions router:
-executions_router = router.register("executions", views.ExecutionViewSet)
+executions_router = router.register(r"executions/?", views.ExecutionViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include(router.urls)),
-    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("api/token", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("api/token/refresh", TokenRefreshView.as_view(), name="token_refresh"),
 ]
