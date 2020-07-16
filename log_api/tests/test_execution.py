@@ -5,7 +5,7 @@ from rest_framework.test import APITestCase
 from rest_framework.test import APIRequestFactory, URLPatternsTestCase
 from rest_framework import status
 from rest_framework.routers import DefaultRouter
-from log_api.models import User, Application, Execution, Event, OperationSystem, Machine
+from log_api.models import User, Application, Execution, Event, Machine
 from log_api import views
 
 # Create your tests here.

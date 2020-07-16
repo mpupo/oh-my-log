@@ -8,18 +8,25 @@ from django.core import validators
 class User(AbstractUser):
     "User model"
     username = models.CharField("Name", max_length=100, unique=True)
-    email = models.EmailField(_('Email address'), max_length=254, validators=[validators.EmailValidator()], unique=True
+    email = models.EmailField(
+        _("Email address"),
+        max_length=254,
+        validators=[validators.EmailValidator()],
+        unique=True,
     )
 
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email', 'first_name', 'last_name']
+    USERNAME_FIELD = "username"
+    REQUIRED_FIELDS = ["email", "first_name", "last_name"]
 
     def __str__(self):
         return f"{self.username}"
 
+
 class UserProfile(models.Model):
     "User Profile model"
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile')
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="profile"
+    )
     nickname = models.CharField("Nickname", max_length=100)
     last_login = models.DateTimeField("Last login", auto_now_add=True)
     active = models.BooleanField("Active")
@@ -38,14 +45,6 @@ class Application(models.Model):
     active = models.BooleanField("Active", null=False, default=True)
     description = models.TextField("Description", null=True)
     version = models.CharField("Version", max_length=8, null=True)
-
-
-class OperationSystem(models.Model):
-    "Operation systems model"
-
-    name = models.CharField("Name", max_length=50)
-    version = models.CharField("Version", max_length=8)
-    installed_apps = models.ManyToManyField(Application)
 
 
 class Machine(models.Model):
@@ -69,7 +68,7 @@ class Machine(models.Model):
     address = models.GenericIPAddressField(
         protocol="IPV4", validators=[validators.validate_ipv4_address], null=True
     )
-    operation_systems = models.ManyToManyField(OperationSystem)
+    applications = models.ManyToManyField(Application)
 
 
 class Execution(models.Model):

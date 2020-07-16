@@ -20,7 +20,7 @@ from rest_framework_extensions.routers import NestedRouterMixin
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from log_api import views
 
-# To make a nested api rotes like 'machines/1/os/2':
+# To make a nested api rotes like 'machines/1/apps/2':
 class NestedDefaultRouter(NestedRouterMixin, DefaultRouter):
     pass
 
@@ -30,27 +30,17 @@ router = NestedDefaultRouter()
 # User Router:
 user_router = router.register(r"users", views.UserViewSet)
 
-# OS Router:
-os_router = router.register(r"os", views.OperationSystemViewSet)
-os_router.register(
-    "installed-apps",
-    views.ApplicationViewSet,
-    basename="app-os",
-    parents_query_lookups=["operationsystem"],
-)
-
 # Machine Router:
 machines_router = router.register("machines", views.MachineViewSet)
 machines_router.register(
-    "os",
-    views.OperationSystemViewSet,
-    basename="machine-os",
+    "apps",
+    views.ApplicationViewSet,
+    basename="machine-apps",
     parents_query_lookups=["machine"],
 )
 
 # Applications router:
 application_router = router.register("applications", views.ApplicationViewSet)
-
 
 # Events router:
 events_router = router.register("events", views.EventViewSet)
@@ -61,6 +51,6 @@ executions_router = router.register("executions", views.ExecutionViewSet)
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include(router.urls)),
-    path("api/token/", TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path("api/token/refresh/", TokenRefreshView.as_view(), name='token_refresh')
+    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 ]
