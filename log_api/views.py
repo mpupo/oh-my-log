@@ -4,11 +4,10 @@ from rest_framework.response import Response
 from rest_framework import permissions
 from rest_framework_extensions.mixins import NestedViewSetMixin
 from rest_framework.parsers import FileUploadParser
-from log_api.models import User, Machine, OperationSystem, Application, Execution, Event
+from log_api.models import User, Machine, Application, Execution, Event
 from log_api.serializers import (
     UserModelSerializer,
     MachineModelSerializer,
-    OperationSystemModelSerializer,
     ApplicationModelSerializer,
     EventModelSerializer,
     ExecutionModelSerializer,
@@ -24,11 +23,6 @@ class UserViewSet(viewsets.ModelViewSet):
 class MachineViewSet(NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = Machine.objects.all()
     serializer_class = MachineModelSerializer
-
-
-class OperationSystemViewSet(NestedViewSetMixin, viewsets.ModelViewSet):
-    queryset = OperationSystem.objects.all()
-    serializer_class = OperationSystemModelSerializer
 
 
 class ApplicationViewSet(NestedViewSetMixin, viewsets.ModelViewSet):
