@@ -1,4 +1,5 @@
-from rest_framework import serializers
+from rest_framework_json_api import serializers
+from rest_framework_json_api.relations import ResourceRelatedField
 from log_api.models import User, UserProfile, Machine, Application, Execution, Event
 import datetime
 
@@ -48,18 +49,50 @@ class UserModelSerializer(serializers.HyperlinkedModelSerializer):
         return instance
 
 
-class ApplicationModelSerializer(serializers.ModelSerializer):
+class ApplicationModelSerializer(serializers.HyperlinkedModelSerializer):
+    included_serializers = {
+        'machines': "log_api.serializers.MachineModelSerializer"
+    }
+
     class Meta:
         model = Application
-        fields = ["id", "name", "active", "description", "version"]
+        fields = ["id", "name", "active", "description", "version", "url"]
+
+    """    def create(self, validated_data):
+            if validated_data.get('machines'):
+                machine_relationship = validated_data.pop('machines')
+            app = Application.objects.create(**validated_data)
+
+            for machine in machine_relationship:
+                machine.applications.add(app)
+            machine_url_related_data = self.context['request'].data.get('Machine')
+            if machine_url_related_data:
+                machine = Machine.objects.get(id=machine_url_related_data['id'])
+                machine.applications.add(app)
+            elif 1 == 1:
+                pass
+            return app"""
 
 
-class MachineModelSerializer(serializers.ModelSerializer):
-    applications = ApplicationModelSerializer(many=True, required=False)
+class MachineModelSerializer(serializers.HyperlinkedModelSerializer):
+    #applications = ApplicationModelSerializer(many=True, required=False)
+    included_serializers = {
+        'applications': ApplicationModelSerializer
+    }
+    applications = serializers.ResourceRelatedField(
+        queryset=Application.objects, 
+        many=True,
+        related_link_view_name='machine-related',
+        related_link_url_kwarg='pk',
+        self_link_view_name='machine-relationships'
+    )
 
     class Meta:
         model = Machine
-        fields = ["id", "name", "active", "environment", "address", "applications"]
+        fields = ["id", "name", "active", "environment", "address", "applications", 'url']
+
+    class JSONAPIMeta:
+        included_resources = ['applications']
 
     def create(self, validated_data):
         if validated_data.get("applications"):
@@ -98,7 +131,7 @@ class ExecutionModelSerializer(serializers.ModelSerializer):
 
 
 class EventModelSerializer(serializers.ModelSerializer):
-    execution_id = serializers.PrimaryKeyRelatedField(queryset=Execution.objects.all())
+    execution_id = serializers.ResourceRelatedField(queryset=Execution.objects.all())
 
     class Meta:
         model = Event
