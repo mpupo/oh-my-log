@@ -13,6 +13,10 @@ class UserProfileModelSerializer(serializers.ModelSerializer):
 class UserModelSerializer(serializers.HyperlinkedModelSerializer):
     profile = UserProfileModelSerializer(required=True)
 
+    included_serializers = {
+        'machines': "log_api.serializers.MachineModelSerializer"
+    }
+
     class Meta:
         model = User
         fields = ["url", "email", "first_name", "last_name", "password", "profile"]
@@ -50,35 +54,24 @@ class UserModelSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ApplicationModelSerializer(serializers.HyperlinkedModelSerializer):
+
     included_serializers = {
-        'machines': "log_api.serializers.MachineModelSerializer"
+        'machines': 'log_api.serializers.MachineModelSerializer'
     }
+
+    class JSONAPIMeta:
+        included_resources = ['machines']
 
     class Meta:
         model = Application
-        fields = ["id", "name", "active", "description", "version", "url"]
-
-    """    def create(self, validated_data):
-            if validated_data.get('machines'):
-                machine_relationship = validated_data.pop('machines')
-            app = Application.objects.create(**validated_data)
-
-            for machine in machine_relationship:
-                machine.applications.add(app)
-            machine_url_related_data = self.context['request'].data.get('Machine')
-            if machine_url_related_data:
-                machine = Machine.objects.get(id=machine_url_related_data['id'])
-                machine.applications.add(app)
-            elif 1 == 1:
-                pass
-            return app"""
-
+        fields = ["id", "name", "active", "description", "version","url"]
 
 class MachineModelSerializer(serializers.HyperlinkedModelSerializer):
-    #applications = ApplicationModelSerializer(many=True, required=False)
+
     included_serializers = {
         'applications': ApplicationModelSerializer
     }
+
     applications = serializers.ResourceRelatedField(
         queryset=Application.objects, 
         many=True,
@@ -93,36 +86,6 @@ class MachineModelSerializer(serializers.HyperlinkedModelSerializer):
 
     class JSONAPIMeta:
         included_resources = ['applications']
-
-    def create(self, validated_data):
-        if validated_data.get("applications"):
-            apps = validated_data.pop("applications")
-            machine = Machine.objects.create(**validated_data)
-            for app in apps:
-                apps_serializer = ApplicationModelSerializer(data=app)
-                apps_serializer.is_valid(raise_exception=True)
-                machine.applications.add(apps_serializer.save())
-        else:
-            machine = Machine.objects.create(**validated_data)
-        return machine
-
-    def update(self, instance, validated_data):
-        instance.name = validated_data.get("name", instance.name)
-        instance.active = validated_data.get("active", instance.active)
-        instance.environment = validated_data.get("environment", instance.environment)
-        instance.address = validated_data.get("address", instance.address)
-        instance.save()
-
-        if validated_data.get("applications"):
-            apps_data = validated_data.pop("applications")
-
-            for app in apps_data:
-                name = app.get("name")
-                app_model = Application.objects.get(name=name)
-                instance.applications.add(app_model)
-
-        return instance
-
 
 class ExecutionModelSerializer(serializers.ModelSerializer):
     class Meta:

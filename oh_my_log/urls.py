@@ -38,12 +38,18 @@ router.register(r"executions", views.ExecutionViewSet)
 #user_router = router.register(r"users/?", views.UserViewSet)
 
 # Machine Router:
-machines_router = routers.NestedSimpleRouter(router,r'machines', lookup='application')
-machines_router.register(
-    "apps",
+machines_app_router = routers.NestedSimpleRouter(router,'machines', lookup='machine')
+machines_app_router.register(
+    "applications",
     views.ApplicationViewSet,
     basename="machines-applications"
 )
+apps_execs_router = routers.NestedSimpleRouter(machines_app_router, 'applications', lookup='application')
+apps_execs_router.register("executions", views.ExecutionViewSet, basename='machines-applications-executions')
+
+execs_events_router = routers.NestedSimpleRouter(apps_execs_router, 'executions', lookup='execution')
+execs_events_router.register("events", views.EventViewSet, basename='machine-applications-executions-events')
+
 
 # Applications router:
 #application_router = router.register(r"applications/?", views.ApplicationViewSet, basename="apps")
@@ -57,7 +63,9 @@ machines_router.register(
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include(router.urls)),
-    path("api/", include(machines_router.urls)),
+    path("api/", include(machines_app_router.urls)),
+    path("api/", include(apps_execs_router.urls)),
+    path("api/", include(execs_events_router.urls)),
     url("api/", include('log_api.urls')),
     path("api/token", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh", TokenRefreshView.as_view(), name="token_refresh"),
