@@ -71,6 +71,10 @@ Porém, a implementação do frontend (não obrigatória) também pode ocorrer n
      alt="Detalhes do erro"
      style="float: left; margin-right: 10px;" />
 
+### 1.2 Prazo
+
+O projeto deverá ser entregue até o dia 20/07/2020, juntamente com um vídeo de explicação/apresentação do realizado pelo participante.
+
 ## 2. Mão na massa
 
 ---
@@ -108,3 +112,25 @@ source venv/bin/activate
 ```bash
 pip install -r requirements.txt
 ```
+
+## 3. Estado atual do projeto:
+
+### 20/07/2020 - Pausado por um tempo
+
+Decidi pausar o desenvolvimento desse projeto pois não estava me dando bem com as libs de URL do Django REST, chegando até mesmo a cortar dois Models (quase 3) para simplificar a URL (/machine/id/application/id/execution/id/event/id) devido a perder muito tempo configurando e tentando entender os lookups, filters, etc. Quando cheguei perto, o tempo já estava no limite (infelizmente).
+
+Dificuldades encontradas até aqui e "superações":
+- **Decidir entre Flat VS Nested URL** _(/machine?application_id vs /machine/id/application/id..)_.: Quase superada, pois travei ao seguir pelo caminho das URLs aninhadas ao utilizar implementações via libs do Django Rest Framework. O erro fatal foram configurações específicas nas quais 1 recurso filho não deveria aparecer em outro recurso-pai que não o possuísse.
+- **Definir um padrão a seguir na API:**: Superada ao tentar utilizar as especificações do [JSON:API](https://jsonapi.org/).
+- **Criação de filtros fora das classes padrões do Django:** Não realizado.
+- **Entender o ecossistema Django e seu funcionamento:** Ganhei uma boa noção, porém, ainda faltam vários tópicos para ter um entendimento melhor do assunto.
+- **Workflow no Git:** ainda faço uns commits que poderiam ser melhores (no quisito texto, necessidade, etc), mas foi uma experiência muito boa!
+
+**Planos pro futuro**
+- Terminar a parte da URL.
+- Criar os filtros.
+- Criar wireframes melhores.
+- Fazer um prótipo de telas.
+- Colocar "no ar" a API.
+- Criar a parte de Front-end.
+- Juntar tudo e ter a aplicação completa.
