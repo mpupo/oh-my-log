@@ -1,6 +1,6 @@
 from rest_framework_json_api import serializers
 from rest_framework_json_api.relations import ResourceRelatedField
-from log_api.models import User, UserProfile, Machine, Application, Execution, Event
+from log_api.models import User, UserProfile, Application, Execution, Event
 import datetime
 
 
@@ -55,42 +55,38 @@ class UserModelSerializer(serializers.HyperlinkedModelSerializer):
 
 class ApplicationModelSerializer(serializers.HyperlinkedModelSerializer):
 
-    included_serializers = {
-        'machines': 'log_api.serializers.MachineModelSerializer'
-    }
-
     class JSONAPIMeta:
-        included_resources = ['machines']
+        included_resources = ['executions']
 
     class Meta:
         model = Application
-        fields = ["id", "name", "active", "description", "version","url"]
+        fields = ["id", "name", "active", "description","version", "url"]
 
-class MachineModelSerializer(serializers.HyperlinkedModelSerializer):
 
     included_serializers = {
-        'applications': ApplicationModelSerializer
+        'executions': 'log_api.serializers.ExecutionModelSerializer'
     }
-
-    applications = serializers.ResourceRelatedField(
-        queryset=Application.objects, 
-        many=True,
-        related_link_view_name='machine-related',
-        related_link_url_kwarg='pk',
-        self_link_view_name='machine-relationships'
-    )
-
-    class Meta:
-        model = Machine
-        fields = ["id", "name", "active", "environment", "address", "applications", 'url']
-
-    class JSONAPIMeta:
-        included_resources = ['applications']
 
 class ExecutionModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Execution
-        fields = ["id", "machine_id", "application_id", "dateref", "success"]
+        fields = ["id", 'application_id', "environment", "dateref", "success", "url", "events"]
+        
+    class JSONAPIMeta:
+        included_resources = ['events']
+
+    events = serializers.ResourceRelatedField(
+    queryset=Execution.objects, 
+    many=True,
+    related_link_view_name='execution-related',
+    related_link_url_kwarg='pk',
+    self_link_view_name='execution-relationships'
+    )
+    
+
+    included_serializers = {
+        'events': 'log_api.serializers.EventModelSerializer',
+    }
 
 
 class EventModelSerializer(serializers.ModelSerializer):

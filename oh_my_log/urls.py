@@ -27,45 +27,18 @@ class NestedDefaultRouter(NestedRouterMixin, DefaultRouter):
     pass
 
 
-router = routers.SimpleRouter(trailing_slash=False)
+router =  NestedDefaultRouter(trailing_slash=False)
 router.register(r"users", views.UserViewSet)
-router.register(r"applications", views.ApplicationViewSet)
-router.register(r'machines', views.MachineViewSet)
-router.register(r"events", views.EventViewSet)
-router.register(r"executions", views.ExecutionViewSet)
+applications_router = router.register(r"applications", views.ApplicationViewSet)
+(applications_router.register(r"executions", views.ExecutionViewSet, basename='apps-executions', parents_query_lookups=['application_id'])
+.register(r"events", views.EventViewSet, basename='apps-executions-events', parents_query_lookups=['execution_id_id', 'execution_id']))
 
-# User Router:
-#user_router = router.register(r"users/?", views.UserViewSet)
-
-# Machine Router:
-machines_app_router = routers.NestedSimpleRouter(router,'machines', lookup='machine')
-machines_app_router.register(
-    "applications",
-    views.ApplicationViewSet,
-    basename="machines-applications"
-)
-apps_execs_router = routers.NestedSimpleRouter(machines_app_router, 'applications', lookup='application')
-apps_execs_router.register("executions", views.ExecutionViewSet, basename='machines-applications-executions')
-
-execs_events_router = routers.NestedSimpleRouter(apps_execs_router, 'executions', lookup='execution')
-execs_events_router.register("events", views.EventViewSet, basename='machine-applications-executions-events')
-
-
-# Applications router:
-#application_router = router.register(r"applications/?", views.ApplicationViewSet, basename="apps")
-
-# Events router:
-#events_router = router.register(r"events/?", views.EventViewSet)
-
-# Executions router:
-#executions_router = router.register(r"executions/?", views.ExecutionViewSet)
+router.register(r"executions/?", views.ExecutionViewSet)
+router.register(r"events/?", views.EventViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include(router.urls)),
-    path("api/", include(machines_app_router.urls)),
-    path("api/", include(apps_execs_router.urls)),
-    path("api/", include(execs_events_router.urls)),
     url("api/", include('log_api.urls')),
     path("api/token", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh", TokenRefreshView.as_view(), name="token_refresh"),

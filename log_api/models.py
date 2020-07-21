@@ -19,7 +19,7 @@ class User(AbstractUser):
     REQUIRED_FIELDS = ["email", "first_name", "last_name"]
 
     def __str__(self):
-        return f"{self.username}"
+        return f"{self.first_name} {self.last_name}"
 
 
 class UserProfile(models.Model):
@@ -34,10 +34,6 @@ class UserProfile(models.Model):
     last_time_modified = models.DateTimeField("Last time modified", auto_now_add=True)
 
 
-class Group(models.Model):
-    pass
-
-
 class Application(models.Model):
     "Application model"
 
@@ -47,41 +43,29 @@ class Application(models.Model):
     version = models.CharField("Version", max_length=8, null=True)
 
 
-class Machine(models.Model):
-    "Machine model"
+class Execution(models.Model):
+    "Execution model"
 
-    class MachineEnvChoices(models.TextChoices):
+    class ExecutionEnvChoices(models.TextChoices):
         "A Class to choose a variety of environment types"
         DEV = "DEV", "Development"
         PROD = "PROD", "Production"
         QA = "QA", "Quality Assurance"
         TEST = "TEST", "Test"
 
-    name = models.CharField("Name", max_length=50, null=True)
-    active = models.BooleanField("Active", null=False, default=True)
+    application_id = models.ForeignKey(
+        Application,
+        on_delete=models.deletion.CASCADE,
+        related_name="apps",
+    )
+
     environment = models.CharField(
         "Enviroment",
         max_length=30,
-        choices=MachineEnvChoices.choices,
-        default=MachineEnvChoices.DEV,
+        choices=ExecutionEnvChoices.choices,
+        default=ExecutionEnvChoices.DEV,
     )
-    address = models.GenericIPAddressField(
-        protocol="IPV4", validators=[validators.validate_ipv4_address], null=True
-    )
-    applications = models.ManyToManyField(Application)
 
-
-class Execution(models.Model):
-    "Execution model"
-
-    machine_id = models.ForeignKey(
-        Machine, on_delete=models.deletion.DO_NOTHING, related_name="machine_execution"
-    )
-    application_id = models.ForeignKey(
-        Application,
-        on_delete=models.deletion.DO_NOTHING,
-        related_name="application_execution",
-    )
     dateref = models.DateTimeField("DateRef", auto_now_add=True)
     success = models.BooleanField("Success", null=False)
 
@@ -106,5 +90,5 @@ class Event(models.Model):
     archived = models.BooleanField("Archived")
     description = models.TextField("Description")
     execution_id = models.ForeignKey(
-        Execution, on_delete=models.deletion.CASCADE, related_name="execution_id"
+        Execution, on_delete=models.deletion.CASCADE, related_name="events"
     )
