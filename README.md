@@ -2,6 +2,30 @@
 
 Projeto final realizado para a plataforma da Codenation no **Acelera Dev - Python**, apoiado pela Stone.
 
+## Índice
+
+- [Central de Erros - Oh My Log](#central-de-erros---oh-my-log)
+  - [Índice](#índice)
+  - [1. Sobre o projeto](#1-sobre-o-projeto)
+    - [1.1 Informações cedidas pela Codenation para realização do projeto](#11-informações-cedidas-pela-codenation-para-realização-do-projeto)
+      - [1.1.1 Contexto](#111-contexto)
+      - [1.1.2 Objetivo](#112-objetivo)
+    - [1.2. Wireframes](#12-wireframes)
+      - [1.2.1 Cadastro](#121-cadastro)
+      - [1.2.2 Login](#122-login)
+      - [1.2.3 Dashboard](#123-dashboard)
+      - [1.2.4 Ambientes](#124-ambientes)
+      - [1.2.5 Ordenação](#125-ordenação)
+      - [1.2.6 Filtro](#126-filtro)
+      - [1.2.7 Detalhes do erro](#127-detalhes-do-erro)
+    - [1.2 Prazo](#12-prazo)
+  - [2. Mão na massa](#2-mão-na-massa)
+    - [2.3 Ferramentas utilizadas](#23-ferramentas-utilizadas)
+    - [2.2 Dependências](#22-dependências)
+  - [3. Estado atual do projeto:](#3-estado-atual-do-projeto)
+    - [20/07/2020 - Pausado por um tempo](#20072020---pausado-por-um-tempo)
+    - [24/07/2020 - Retornando](#24072020---retornando)
+
 ## 1. Sobre o projeto
 
 ---
@@ -134,3 +158,7 @@ Dificuldades encontradas até aqui e "superações":
 - Colocar "no ar" a API.
 - Criar a parte de Front-end.
 - Juntar tudo e ter a aplicação completa.
+
+### 24/07/2020 - Retornando
+
+Após algumas pesquisas, decidi retornar aos poucos com o desenvolvimento do projeto, visto que, em teoria, falta pouco para se tornar uma aplicação completa (ainda que eu termine após o prazo estipulado).
