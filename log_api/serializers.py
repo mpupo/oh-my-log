@@ -1,5 +1,6 @@
-from rest_framework import serializers
-from log_api.models import User, UserProfile, Machine, Application, Execution, Event
+from rest_framework_json_api import serializers
+from rest_framework_json_api.relations import ResourceRelatedField
+from log_api.models import User, UserProfile, Application, Execution, Event
 import datetime
 
 
@@ -11,7 +12,7 @@ class UserProfileModelSerializer(serializers.ModelSerializer):
 
 class UserModelSerializer(serializers.HyperlinkedModelSerializer):
     profile = UserProfileModelSerializer(required=True)
-
+    
     class Meta:
         model = User
         fields = ["url", "email", "first_name", "last_name", "password", "profile"]
@@ -48,58 +49,49 @@ class UserModelSerializer(serializers.HyperlinkedModelSerializer):
         return instance
 
 
-class ApplicationModelSerializer(serializers.ModelSerializer):
+class ApplicationModelSerializer(serializers.HyperlinkedModelSerializer):
+    
     class Meta:
         model = Application
-        fields = ["id", "name", "active", "description", "version"]
+        fields = ["id", "name", "active", "description", "version", "url"]
 
-
-class MachineModelSerializer(serializers.ModelSerializer):
-    applications = ApplicationModelSerializer(many=True, required=False)
-
+class MachineModelSerializer(serializers.HyperlinkedModelSerializer):
+    
     class Meta:
         model = Machine
-        fields = ["id", "name", "active", "environment", "address", "applications"]
-
-    def create(self, validated_data):
-        if validated_data.get("applications"):
-            apps = validated_data.pop("applications")
-            machine = Machine.objects.create(**validated_data)
-            for app in apps:
-                apps_serializer = ApplicationModelSerializer(data=app)
-                apps_serializer.is_valid(raise_exception=True)
-                machine.applications.add(apps_serializer.save())
-        else:
-            machine = Machine.objects.create(**validated_data)
-        return machine
-
-    def update(self, instance, validated_data):
-        instance.name = validated_data.get("name", instance.name)
-        instance.active = validated_data.get("active", instance.active)
-        instance.environment = validated_data.get("environment", instance.environment)
-        instance.address = validated_data.get("address", instance.address)
-        instance.save()
-
-        if validated_data.get("applications"):
-            apps_data = validated_data.pop("applications")
-
-            for app in apps_data:
-                name = app.get("name")
-                app_model = Application.objects.get(name=name)
-                instance.applications.add(app_model)
-
-        return instance
-
+        fields = [
+            "id",
+            "name",
+            "active",
+            "environment",
+            "address",
+            "url",
+        ]
 
 class ExecutionModelSerializer(serializers.ModelSerializer):
+    included_serializers = {
+        'application': ApplicationModelSerializer,
+        'machine': MachineModelSerializer
+    }
+    
     class Meta:
         model = Execution
-        fields = ["id", "machine_id", "application_id", "dateref", "success"]
-
+        fields = ["id", "machine", "application", "dateref", "success", "archived", "url"]
+    
+    class JSONAPIMeta:
+        included_resources = ['application', 'machine']    
 
 class EventModelSerializer(serializers.ModelSerializer):
-    execution_id = serializers.PrimaryKeyRelatedField(queryset=Execution.objects.all())
+    execution = serializers.ResourceRelatedField(queryset=Execution.objects.all(), required=False)
 
     class Meta:
         model = Event
-        fields = ["id", "level", "dateref", "archived", "description", "execution_id"]
+        fields = ["id", "level", "dateref", "archived", "description", "execution"]
+
+    def create(self, validated_data):
+            if validated_data.get('execution'):
+                return super(EventModelSerializer, self).create(validated_data)
+            else:
+                execution_id = self.context.get('view').kwargs.get('parent_lookup_execution')
+                validated_data['execution'] = Execution.objects.get(pk=execution_id)
+                return super(EventModelSerializer, self).create(validated_data)
