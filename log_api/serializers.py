@@ -1,6 +1,6 @@
 from rest_framework_json_api import serializers
 from rest_framework_json_api.relations import ResourceRelatedField
-from log_api.models import User, UserProfile, Machine, Application, Execution, Event
+from log_api.models import User, UserProfile, Application, Execution, Event
 import datetime
 
 

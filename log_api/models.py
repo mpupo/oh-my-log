@@ -19,7 +19,7 @@ class User(AbstractUser):
     REQUIRED_FIELDS = ["email", "first_name", "last_name"]
 
     def __str__(self):
-        return f"{self.username}"
+        return f"{self.first_name} {self.last_name}"
 
 
 class UserProfile(models.Model):
@@ -51,20 +51,24 @@ class Application(models.Model):
 class Machine(models.Model):
     "An machine is the environment where the applications are installed"
 
-    class MachineEnvChoices(models.TextChoices):
+    class ExecutionEnvChoices(models.TextChoices):
         "A Class to choose a variety of environment types"
         DEV = "DEV", "Development"
         PROD = "PROD", "Production"
         QA = "QA", "Quality Assurance"
         TEST = "TEST", "Test"
 
-    name = models.CharField("Name", max_length=50, null=True)
-    active = models.BooleanField("Active", null=False, default=True)
+    application_id = models.ForeignKey(
+        Application,
+        on_delete=models.deletion.CASCADE,
+        related_name="apps",
+    )
+
     environment = models.CharField(
         "Enviroment",
         max_length=30,
-        choices=MachineEnvChoices.choices,
-        default=MachineEnvChoices.DEV,
+        choices=ExecutionEnvChoices.choices,
+        default=ExecutionEnvChoices.DEV,
     )
     address = models.GenericIPAddressField(
         protocol="IPV4", validators=[validators.validate_ipv4_address], null=True

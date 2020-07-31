@@ -1,16 +1,13 @@
-from django.shortcuts import render
 from rest_framework_json_api.views import RelationshipView, ModelViewSet
 from rest_framework_json_api import filters
 from rest_framework_json_api import django_filters
 from rest_framework.filters import SearchFilter
 from rest_framework import viewsets, mixins
-from rest_framework.response import Response
 from rest_framework import permissions
 from rest_framework_extensions.mixins import NestedViewSetMixin
 from log_api.models import User, Machine, Application, Execution, Event
 from log_api.serializers import (
     UserModelSerializer,
-    MachineModelSerializer,
     ApplicationModelSerializer,
     EventModelSerializer,
     ExecutionModelSerializer,
