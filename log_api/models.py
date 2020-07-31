@@ -6,7 +6,7 @@ from django.core import validators
 
 # Create your models here.
 class User(AbstractUser):
-    "User model"
+    "User data"
     username = models.CharField("Name", max_length=100, unique=True)
     email = models.EmailField(
         _("Email address"),
@@ -23,9 +23,9 @@ class User(AbstractUser):
 
 
 class UserProfile(models.Model):
-    "User Profile model"
+    "Stores additional data from User."
     user = models.OneToOneField(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="profile"
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="user_info"
     )
     nickname = models.CharField("Nickname", max_length=100)
     last_login = models.DateTimeField("Last login", auto_now_add=True)
@@ -34,21 +34,22 @@ class UserProfile(models.Model):
     last_time_modified = models.DateTimeField("Last time modified", auto_now_add=True)
 
 
-class Group(models.Model):
-    pass
-
-
 class Application(models.Model):
-    "Application model"
+    """An application is an program who is installed on a machine and triggers many
+    executions, generating event logs.
+    """
 
     name = models.CharField("Name", max_length=50, null=False, default="App-Name")
     active = models.BooleanField("Active", null=False, default=True)
     description = models.TextField("Description", null=True)
     version = models.CharField("Version", max_length=8, null=True)
+    
+    def __str__(self):
+        return f"{self.name} version {self.version}"
 
 
 class Machine(models.Model):
-    "Machine model"
+    "An machine is the environment where the applications are installed"
 
     class MachineEnvChoices(models.TextChoices):
         "A Class to choose a variety of environment types"
@@ -68,27 +69,31 @@ class Machine(models.Model):
     address = models.GenericIPAddressField(
         protocol="IPV4", validators=[validators.validate_ipv4_address], null=True
     )
-    applications = models.ManyToManyField(Application)
+    
+    def __str__(self):
+        return f"{self.name}|{self.environment}|{self.address}"
 
 
 class Execution(models.Model):
-    "Execution model"
+    """An execution is a record of an start from an application. It is the
+    beginning of an log record."""
 
-    machine_id = models.ForeignKey(
-        Machine, on_delete=models.deletion.DO_NOTHING, related_name="machine_execution"
+    machine = models.ForeignKey(
+        Machine, on_delete=models.deletion.DO_NOTHING, related_name="executions"
     )
-    application_id = models.ForeignKey(
+    application = models.ForeignKey(
         Application,
         on_delete=models.deletion.DO_NOTHING,
-        related_name="application_execution",
+        related_name="executions",
     )
     dateref = models.DateTimeField("DateRef", auto_now_add=True)
-    success = models.BooleanField("Success", null=False)
+    success = models.BooleanField("Success", null=True)
+    archived = models.BooleanField("Archived", default=False)
 
 
 class Event(models.Model):
-    "Event model"
-
+    "An event is the every log occurrence."
+    
     class EventLevelChoices(models.TextChoices):
         "A Class to choose a variety of event types"
         CRITICAL = "CRITICAL", "CRITICAL"
@@ -103,8 +108,8 @@ class Event(models.Model):
         default=EventLevelChoices.INFO,
     )
     dateref = models.DateTimeField("DateRef")
-    archived = models.BooleanField("Archived")
     description = models.TextField("Description")
-    execution_id = models.ForeignKey(
-        Execution, on_delete=models.deletion.CASCADE, related_name="execution_id"
+    execution = models.ForeignKey(
+        Execution, on_delete=models.deletion.CASCADE, related_name="related_execution"
     )
+

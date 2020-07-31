@@ -12,11 +12,7 @@ class UserProfileModelSerializer(serializers.ModelSerializer):
 
 class UserModelSerializer(serializers.HyperlinkedModelSerializer):
     profile = UserProfileModelSerializer(required=True)
-
-    included_serializers = {
-        'machines': "log_api.serializers.MachineModelSerializer"
-    }
-
+    
     class Meta:
         model = User
         fields = ["url", "email", "first_name", "last_name", "password", "profile"]
@@ -54,48 +50,48 @@ class UserModelSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ApplicationModelSerializer(serializers.HyperlinkedModelSerializer):
-
-    included_serializers = {
-        'machines': 'log_api.serializers.MachineModelSerializer'
-    }
-
-    class JSONAPIMeta:
-        included_resources = ['machines']
-
+    
     class Meta:
         model = Application
-        fields = ["id", "name", "active", "description", "version","url"]
+        fields = ["id", "name", "active", "description", "version", "url"]
 
 class MachineModelSerializer(serializers.HyperlinkedModelSerializer):
-
-    included_serializers = {
-        'applications': ApplicationModelSerializer
-    }
-
-    applications = serializers.ResourceRelatedField(
-        queryset=Application.objects, 
-        many=True,
-        related_link_view_name='machine-related',
-        related_link_url_kwarg='pk',
-        self_link_view_name='machine-relationships'
-    )
-
+    
     class Meta:
         model = Machine
-        fields = ["id", "name", "active", "environment", "address", "applications", 'url']
-
-    class JSONAPIMeta:
-        included_resources = ['applications']
+        fields = [
+            "id",
+            "name",
+            "active",
+            "environment",
+            "address",
+            "url",
+        ]
 
 class ExecutionModelSerializer(serializers.ModelSerializer):
+    included_serializers = {
+        'application': ApplicationModelSerializer,
+        'machine': MachineModelSerializer
+    }
+    
     class Meta:
         model = Execution
-        fields = ["id", "machine_id", "application_id", "dateref", "success"]
-
+        fields = ["id", "machine", "application", "dateref", "success", "archived", "url"]
+    
+    class JSONAPIMeta:
+        included_resources = ['application', 'machine']    
 
 class EventModelSerializer(serializers.ModelSerializer):
-    execution_id = serializers.ResourceRelatedField(queryset=Execution.objects.all())
+    execution = serializers.ResourceRelatedField(queryset=Execution.objects.all(), required=False)
 
     class Meta:
         model = Event
-        fields = ["id", "level", "dateref", "archived", "description", "execution_id"]
+        fields = ["id", "level", "dateref", "archived", "description", "execution"]
+
+    def create(self, validated_data):
+            if validated_data.get('execution'):
+                return super(EventModelSerializer, self).create(validated_data)
+            else:
+                execution_id = self.context.get('view').kwargs.get('parent_lookup_execution')
+                validated_data['execution'] = Execution.objects.get(pk=execution_id)
+                return super(EventModelSerializer, self).create(validated_data)
